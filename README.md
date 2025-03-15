@@ -1,21 +1,12 @@
-<p align="center">
-  <img src="./assets/kusty.png" alt="Kustomer Kusty"/>
-</p>
+# parcelLab App on Kustomer (with a K)
 
-# Kustomer App Templates
+> 🚧 Only testing so far
 
-Welcome to your first Kustomer app! There are many things an app can do, and different types of apps that can be built to integrate with the Kustomer platform, so to get you started, we have provided a couple different app configurations for what you might want to build, explaining their pieces inline. We also provide a simple command for registering and updating your apps to your Kustomer organization.
+* App defintion at `src/parcellab/index.js`
+* This app definition just tells Kustomer to fetch a static HTML at [https://eu-central-1.console.aws.amazon.com/s3/buckets/parcellab-cdn?prefix=apps%2Fkustomer%2F&region=eu-central-1&bucketType=general&tab=objects](https://eu-central-1.console.aws.amazon.com/s3/buckets/parcellab-cdn?prefix=apps%2Fkustomer%2F&region=eu-central-1&bucketType=general&tab=objects)
+* Then we do some stuff in the frontend, see `src/parcellab/src/parcellab-widget.html`
 
-## The Basics
-
-The main portion of this repo will be located within the `./src` folder. Here, in the root `index.js`, we can import and include new apps in the available apps array. This file is used to hold all of the available apps you have available, and where the `get-app-json` and `register-new-version` commands will look to pull the available JSON. Each subfolder will contain the contents of a single app. From here, subfolders will contain different properties of an app, all of which get bundled into the app JSON. *In order to use an app, you will need to make sure it is added to the apps array in index.js*.
-
-**Note** Some templates include a placeholder string beginning with `<<` and ending with `>>`. Replace the value with a string unique to your app.
-
-While some of these demo apps contain pieces that others do not, an app can support all of these features at once! Combining different portions of an app, such as advanced Kviews, Outbound Webhooks, and Workflows can create extremely feature-rich experiences for your user, so feel free to experiment combining different possibilities.
-
-<br />
-
+## Docs
 
 ### App Properties
 
