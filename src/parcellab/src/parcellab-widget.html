@@ -1,0 +1,97 @@
+<html>
+    <head>
+        <script src="https://cdn.kustomerapp.com/card-js/latest/kustomer-card.min.js"></script>
+        <script>
+            /**
+             * Function to extract the parcelLabApiToken from the URL
+             * @returns {string|null} The parcelLabApiToken value or null if not found
+             */
+            function getParcelLabApiToken() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const parcelLabApiToken = urlParams.get('parcelLabApiToken');
+                return parcelLabApiToken;
+            }
+
+            /**
+             * Function to extract the email from the context JSON
+             * @param {Object} contextJSON - The context JSON object
+             * @returns {string|null} The email value or null if not found
+             */
+            function getEmailFromContext(contextJSON) {
+                var customer_attributes = contextJSON.customer.attributes;
+                if (customer_attributes.emails.length) {
+                    return customer_attributes.emails[0].email;
+                }
+                return null;
+            }
+
+            function loadContext() {
+                // Kustomer.initialize is required for card visibility in the panel.
+                Kustomer.initialize(function(contextJSON) {
+                    const parcelLabApiToken = getParcelLabApiToken();
+                    if (!parcelLabApiToken) {
+                        Kustomer.updateStatus("error", "parcelLab API token not configured, go to settings page to set up");
+                        return;
+                    }
+
+                    const email = getEmailFromContext(contextJSON);
+                    if (!email) {
+                        Kustomer.close();
+                        return;
+                    }
+
+                    // Call the parcelLab API to get orders for the customer email
+                    fetch(`https://api.parcellab.com/orders/app?customerEmail=${email}`, {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${parcelLabApiToken}`,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! Status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Handle the successful response
+                        console.log('Orders data:', data);
+                        
+                        // Convert the data to a formatted JSON string
+                        const jsonString = JSON.stringify(data, null, 2);
+                        
+                        // Encode the JSON string to prevent HTML injection
+                        const encodedJsonString = jsonString
+                            .replace(/&/g, '&amp;')
+                            .replace(/</g, '&lt;')
+                            .replace(/>/g, '&gt;')
+                            .replace(/"/g, '&quot;')
+                            .replace(/'/g, '&#039;');
+                        
+                        // Fill the container with the formatted JSON data
+                        document.getElementById('container').innerHTML = `<pre>${encodedJsonString}</pre>`;
+                        
+                        // Update the Kustomer status to show success
+                        Kustomer.updateStatus("success", "Orders retrieved successfully");
+                    })
+                    .catch(error => {
+                        console.error('Error fetching orders:', error);
+                        Kustomer.updateStatus("error", "Failed to fetch orders for email from parcelLab API");
+                    });
+                });
+            }
+        </script>
+    </head>
+    <body onload="loadContext()">
+        <div class="ui card mainCard">
+            <div class="content">
+                <div class="ui header cardHeader">
+                    parcelLab
+                </div>
+            </div>
+            <hr class="lineBreak">
+            <div id="container" class="ui one textArea"></div>
+        </div>
+    </body>
+</html>
