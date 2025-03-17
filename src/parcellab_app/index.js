@@ -3,7 +3,7 @@ import Commands from './commands';
 
 export default {
     app: 'parcellab_app',
-    version: '0.0.21',
+    version: '0.0.28',
     appDetails: {
         appDeveloper: {
             name: 'parcelLab',

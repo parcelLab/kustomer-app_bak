@@ -40,21 +40,31 @@
                         return;
                     }
 
+                    Kustomer.open();
+
                     try {
                         const response = await Kustomer.command.run('parcellab_app_67d870cd1e9424e90dc47333.app.api.fetchOrderData', {
-                            body: { "customerEmail": email},
+                            args: { "customerEmail": email},
                             headers: {
                                 Authorization: "Bearer {{authToken}}"
                             }
                         })
 
+                        const orders = response?.responseBody?.orders || [];
+                        if (orders.length === 0) {
+                            Kustomer.updateStatus("info", "No orders found");
+                            return;
+                        }
+                        
                         // Fill the container with the formatted JSON data
-                        document.getElementById('container').innerHTML = `<pre>${encodedJsonString}</pre>`;
+                        const text = document.createTextNode("okay: " + JSON.stringify(orders));
+                        document.getElementById('container').appendChild(text);
+                        Kustomer.resize();
                             
                         // Update the Kustomer status to show success
-                        Kustomer.updateStatus("success", "Orders retrieved successfully");
+                        // Kustomer.updateStatus("success", "Orders retrieved successfully");
                     } catch (error) {
-                        Kustomer.updateStatus("error", "Error retrieving orders");
+                        Kustomer.updateStatus("danger", "Error retrieving orders");
                     }
                 });
             }
@@ -68,7 +78,9 @@
                 </div>
             </div>
             <hr class="lineBreak">
-            <div id="container" class="ui one textArea"></div>
+            <div id="container" class="ui one textArea">
+                wtf2
+            </div>
         </div>
     </body>
 </html>
