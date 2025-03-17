@@ -1,4 +1,4 @@
-import Kviews from './kviews';
+import Widgets from './widgets';
 
 export default {
     app: 'parcellab_app',
@@ -38,10 +38,10 @@ export default {
         en_us: {
           "parcellab_app.settings.page.title": "parcelLab Configuration", 
           "parcellab_app.settings.page.description": "To connect your parcelLab account to Kustomer, you need to provide your parcelLab Account ID and API token.\n\n1. Go to [Settings > API Tokens in your parcelLab account](https://app.parcellab.com/service/account/apitoken).\n2. Click `Add API Token` in the top right corner.\n3. Leave the Scopes to only `Read` selected, provide a description, e.g. `Kustomer Integration`. Click `Save`.\n4. On the next page, copy the encoded token as shown in the screenshot below. **Be aware that the token will only be shown once for security reasons.**\n\n![Click here to copy encoded API Token](https://cdn.parcellab.com/apps/kustomer/token_help.png)",
-          "parcellab_app.settings.path.default.parcelLabApiToken.displayName": "API Token"
+          "parcellab_app.settings.path.default.parcelLabApiToken.displayName": "API Token",
           "parcellab_app.settings.path.default.parcelLabApiToken.description": "Your encoded parcelLab API Token",
         }
     },
-    postInstallMessage: 'Congratulations! You\'ve installed an app with a Custom CardJs Kview',
-    kviews: Kviews,
+    postInstallMessage: 'parcelLab app installed successfully, please configure the app in the settings page',
+    widgets: Widgets,
 };
