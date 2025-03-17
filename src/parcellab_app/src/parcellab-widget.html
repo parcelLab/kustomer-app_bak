@@ -1,86 +1,88 @@
 <html>
-    <head>
-        <script src="https://cdn.kustomerapp.com/card-js/latest/kustomer-card.min.js"></script>
-        <script>
-            /**
-             * Function to extract the parcelLabApiToken from the URL
-             * @returns {string|null} The parcelLabApiToken value or null if not found
-             */
-            function getParcelLabApiToken() {
-                const urlParams = new URLSearchParams(window.location.search);
-                const parcelLabApiToken = urlParams.get('parcelLabApiToken');
-                return parcelLabApiToken;
+  <head>
+    <script src="https://cdn.kustomerapp.com/card-js/latest/kustomer-card.min.js"></script>
+    <script>
+      /**
+       * Function to extract the parcelLabApiToken from the URL
+       * @returns {string|null} The parcelLabApiToken value or null if not found
+       */
+      function getParcelLabApiToken() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const parcelLabApiToken = urlParams.get("parcelLabApiToken");
+        return parcelLabApiToken;
+      }
+
+      /**
+       * Function to extract the email from the context JSON
+       * @param {Object} contextJSON - The context JSON object
+       * @returns {string|null} The email value or null if not found
+       */
+      function getEmailFromContext(contextJSON) {
+        var customer_attributes = contextJSON.customer.attributes;
+        if (customer_attributes.emails.length) {
+          return customer_attributes.emails[0].email;
+        }
+        return null;
+      }
+
+      function loadContext() {
+        // Kustomer.initialize is required for card visibility in the panel.
+        Kustomer.initialize(async function (contextJSON) {
+          const parcelLabApiToken = getParcelLabApiToken();
+          if (!parcelLabApiToken) {
+            Kustomer.updateStatus(
+              "error",
+              "parcelLab API token not configured, go to settings page to set up"
+            );
+            return;
+          }
+
+          const email = getEmailFromContext(contextJSON);
+          if (!email) {
+            Kustomer.close();
+            return;
+          }
+
+          Kustomer.open();
+
+          try {
+            const response = await Kustomer.command.run(
+              "parcellab_app_67d870cd1e9424e90dc47333.app.api.fetchOrderData",
+              {
+                args: { customerEmail: email },
+                headers: {
+                  Authorization: "Bearer {{authToken}}",
+                },
+              }
+            );
+
+            const orders = response?.responseBody?.orders || [];
+            if (orders.length === 0) {
+              Kustomer.updateStatus("info", "No orders found");
+              return;
             }
 
-            /**
-             * Function to extract the email from the context JSON
-             * @param {Object} contextJSON - The context JSON object
-             * @returns {string|null} The email value or null if not found
-             */
-            function getEmailFromContext(contextJSON) {
-                var customer_attributes = contextJSON.customer.attributes;
-                if (customer_attributes.emails.length) {
-                    return customer_attributes.emails[0].email;
-                }
-                return null;
-            }
+            // Fill the container with the formatted JSON data
+            const text = document.createTextNode("okay: " + JSON.stringify(orders));
+            document.getElementById("container").appendChild(text);
+            Kustomer.resize();
 
-            function loadContext() {
-                // Kustomer.initialize is required for card visibility in the panel.
-                Kustomer.initialize(async function(contextJSON) {
-                    const parcelLabApiToken = getParcelLabApiToken();
-                    if (!parcelLabApiToken) {
-                        Kustomer.updateStatus("error", "parcelLab API token not configured, go to settings page to set up");
-                        return;
-                    }
-
-                    const email = getEmailFromContext(contextJSON);
-                    if (!email) {
-                        Kustomer.close();
-                        return;
-                    }
-
-                    Kustomer.open();
-
-                    try {
-                        const response = await Kustomer.command.run('parcellab_app_67d870cd1e9424e90dc47333.app.api.fetchOrderData', {
-                            args: { "customerEmail": email},
-                            headers: {
-                                Authorization: "Bearer {{authToken}}"
-                            }
-                        })
-
-                        const orders = response?.responseBody?.orders || [];
-                        if (orders.length === 0) {
-                            Kustomer.updateStatus("info", "No orders found");
-                            return;
-                        }
-                        
-                        // Fill the container with the formatted JSON data
-                        const text = document.createTextNode("okay: " + JSON.stringify(orders));
-                        document.getElementById('container').appendChild(text);
-                        Kustomer.resize();
-                            
-                        // Update the Kustomer status to show success
-                        // Kustomer.updateStatus("success", "Orders retrieved successfully");
-                    } catch (error) {
-                        Kustomer.updateStatus("danger", "Error retrieving orders");
-                    }
-                });
-            }
-        </script>
-    </head>
-    <body onload="loadContext()">
-        <div class="ui card mainCard">
-            <div class="content">
-                <div class="ui header cardHeader">
-                    parcelLab
-                </div>
-            </div>
-            <hr class="lineBreak">
-            <div id="container" class="ui one textArea">
-                wtf2
-            </div>
-        </div>
-    </body>
+            // Update the Kustomer status to show success
+            // Kustomer.updateStatus("success", "Orders retrieved successfully");
+          } catch (error) {
+            Kustomer.updateStatus("danger", "Error retrieving orders");
+          }
+        });
+      }
+    </script>
+  </head>
+  <body onload="loadContext()">
+    <div class="ui card mainCard">
+      <div class="content">
+        <div class="ui header cardHeader">parcelLab</div>
+      </div>
+      <hr class="lineBreak" />
+      <div id="container" class="ui one textArea">wtf2</div>
+    </div>
+  </body>
 </html>
