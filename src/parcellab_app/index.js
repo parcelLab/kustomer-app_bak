@@ -1,8 +1,9 @@
 import Widgets from './widgets';
+import Commands from './commands';
 
 export default {
     app: 'parcellab_app',
-    version: '0.0.5',
+    version: '0.0.21',
     appDetails: {
         appDeveloper: {
             name: 'parcelLab',
@@ -23,10 +24,6 @@ export default {
     iconUrl: 'https://cdn.parcellab.com/apps/kustomer/parcellab_kustomer_icon.png',
     tags: ['messaging', 'ai', 'ecommerce'],
     changelog: {
-        "0.0.5": "{{March 2025}}Update",
-        "0.0.4": "{{March 2025}}Update",
-        "0.0.3": "{{March 2025}}Update",
-        "0.0.2": "{{March 2025}}Update",
         "0.0.1": "{{March 2025}}Initial release",
     },
     settings: {
@@ -48,4 +45,5 @@ export default {
     },
     postInstallMessage: 'parcelLab app installed successfully, please configure the app in the settings page',
     widgets: Widgets,
+    commands: Commands,
 };
