@@ -1,6 +1,9 @@
 <html>
   <head>
     <script src="https://cdn.kustomerapp.com/card-js/latest/kustomer-card.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     <script>
       /**
        * Function to extract the parcelLabApiToken from the URL
@@ -25,13 +28,12 @@
         return null;
       }
 
-      function loadContext() {
-        // Kustomer.initialize is required for card visibility in the panel.
+      function init() {
         Kustomer.initialize(async function (contextJSON) {
           const parcelLabApiToken = getParcelLabApiToken();
           if (!parcelLabApiToken) {
             Kustomer.updateStatus(
-              "error",
+              "danger",
               "parcelLab API token not configured, go to settings page to set up"
             );
             return;
@@ -62,13 +64,61 @@
               return;
             }
 
-            // Fill the container with the formatted JSON data
-            const text = document.createTextNode("okay: " + JSON.stringify(orders));
-            document.getElementById("container").appendChild(text);
-            Kustomer.resize();
+            orders.forEach(order => {
+              // Create card container
+              const card = document.createElement("div");
+              card.className = "bg-white rounded-lg shadow-md p-2 m-1 mb-2 border border-gray-200";
 
-            // Update the Kustomer status to show success
-            // Kustomer.updateStatus("success", "Orders retrieved successfully");
+              // Create card header
+              const header = document.createElement("div");
+              header.className = "flex justify-between items-center mb-2";
+
+              // Order number
+              const orderTitle = document.createElement("h3");
+              orderTitle.className = "text-md font-semibold text-slate-800";
+              orderTitle.textContent = `Order ${order.orderNo || "N/A"}`;
+              header.appendChild(orderTitle);
+
+              // Order status
+              const status = document.createElement("span");
+              status.className = `px-2 py-1 text-xs font-medium rounded ${
+                order.status === "delivered"
+                  ? "bg-green-100 text-green-800"
+                  : order.status === "in_transit"
+                  ? "bg-blue-100 text-blue-800"
+                  : "bg-gray-100 text-gray-800"
+              }`;
+              status.textContent = order.status || "Processing";
+              header.appendChild(status);
+
+              // Add header to card
+              card.appendChild(header);
+
+              // Order details
+              const details = document.createElement("div");
+              details.className = "text-sm text-gray-600 space-y-2";
+
+              // Delivery date if available
+              if (order.deliveryDate) {
+                const date = document.createElement("p");
+                date.innerHTML = `<span class="font-medium">Delivery Date:</span> ${order.deliveryDate}`;
+                details.appendChild(date);
+              }
+
+              // Add more order details as needed
+              if (order.trackingNumber) {
+                const tracking = document.createElement("p");
+                tracking.innerHTML = `<span class="font-medium">Tracking:</span> ${order.trackingNumber}`;
+                details.appendChild(tracking);
+              }
+
+              card.appendChild(details);
+
+              // Add to container
+              document.getElementById("container").appendChild(card);
+            });
+
+            Kustomer.resize();
           } catch (error) {
             Kustomer.updateStatus("danger", "Error retrieving orders");
           }
@@ -76,13 +126,7 @@
       }
     </script>
   </head>
-  <body onload="loadContext()">
-    <div class="ui card mainCard">
-      <div class="content">
-        <div class="ui header cardHeader">parcelLab</div>
-      </div>
-      <hr class="lineBreak" />
-      <div id="container" class="ui one textArea">wtf2</div>
-    </div>
+  <body onload="init()">
+    <div id="container"></div>
   </body>
 </html>
