@@ -5,6 +5,7 @@
 * App defintion at `src/parcellab/index.js`
 * This app definition just tells Kustomer to fetch a static HTML at [https://eu-central-1.console.aws.amazon.com/s3/buckets/parcellab-cdn?prefix=apps%2Fkustomer%2F&region=eu-central-1&bucketType=general&tab=objects](https://eu-central-1.console.aws.amazon.com/s3/buckets/parcellab-cdn?prefix=apps%2Fkustomer%2F&region=eu-central-1&bucketType=general&tab=objects)
 * Then we do some stuff in the frontend, see `src/parcellab/src/parcellab-widget.html`
+* Our dev account is: [https://par-parcellab-rory.kustomerapp.com/app](https://par-parcellab-rory.kustomerapp.com/app)
 
 ## Docs
 

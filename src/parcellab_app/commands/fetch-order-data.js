@@ -2,7 +2,7 @@ export default {
   "name": "parcellab_app.app.api.fetchOrderData",
   "displayName": "Fetch Order Data from parcelLab",
   "permittedArgs": ["parcelLabApiToken", "customerEmail"],
-  "url": "https://api.parcellab.com/orders/bot?customerEmail={{{customerEmail}}}&u=1619650",
+  "url": "https://api.parcellab.com/orders/bot?customerEmail={{{customerEmail}}}&u=1619650&showReturns=true",
 
   "httpMethod": "get",
   "cacheSeconds": 15,

@@ -6,46 +6,144 @@
 
     <script>
       /**
-       * Function to extract the parcelLabApiToken from the URL
-       * @returns {string|null} The parcelLabApiToken value or null if not found
-       */
-      function getParcelLabApiToken() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const parcelLabApiToken = urlParams.get("parcelLabApiToken");
-        return parcelLabApiToken;
-      }
-
-      /**
        * Function to extract the email from the context JSON
        * @param {Object} contextJSON - The context JSON object
        * @returns {string|null} The email value or null if not found
        */
       function getEmailFromContext(contextJSON) {
         var customer_attributes = contextJSON.customer.attributes;
-        if (customer_attributes.emails.length) {
+        if (customer_attributes.emails && customer_attributes.emails.length) {
           return customer_attributes.emails[0].email;
         }
         return null;
       }
 
+      /**
+       * Function to format a date string into a more readable format
+       * @param {string} dateString - The date string to format
+       * @returns {string} Formatted date string
+       */
+      function formatDate(dateString) {
+        if (!dateString) return "N/A";
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+        });
+      }
+
+      /**
+       * Gets the appropriate status color based on the delivery status
+       * @param {string} status - The delivery status
+       * @returns {Object} An object containing color classes
+       */
+      function getStatusColors(status) {
+        switch (status?.toLowerCase()) {
+          case "delivered":
+            return {
+              bg: "bg-green-100",
+              text: "text-green-800",
+              icon: "text-green-500",
+              border: "border-green-200",
+            };
+          case "in_transit":
+            return {
+              bg: "bg-blue-100",
+              text: "text-blue-800",
+              icon: "text-blue-500",
+              border: "border-blue-200",
+            };
+          case "out_for_delivery":
+            return {
+              bg: "bg-indigo-100",
+              text: "text-indigo-800",
+              icon: "text-indigo-500",
+              border: "border-indigo-200",
+            };
+          case "exception":
+          case "returned":
+            return {
+              bg: "bg-red-100",
+              text: "text-red-800",
+              icon: "text-red-500",
+              border: "border-red-200",
+            };
+          case "pickup_ready":
+          case "pickup_readytoday":
+            return {
+              bg: "bg-purple-100",
+              text: "text-purple-800",
+              icon: "text-purple-500",
+              border: "border-purple-200",
+            };
+          case "delayed":
+            return {
+              bg: "bg-yellow-100",
+              text: "text-yellow-800",
+              icon: "text-yellow-500",
+              border: "border-yellow-200",
+            };
+          default:
+            return {
+              bg: "bg-gray-100",
+              text: "text-gray-800",
+              icon: "text-gray-500",
+              border: "border-gray-200",
+            };
+        }
+      }
+
+      /**
+       * Gets a status icon based on the delivery status
+       * @param {string} status - The delivery status
+       * @returns {string} HTML for the status icon
+       */
+      function getStatusIcon(status) {
+        const colors = getStatusColors(status);
+
+        switch (status?.toLowerCase()) {
+          case "delivered":
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>`;
+          case "in_transit":
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z" /><path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z" /></svg>`;
+          case "out_for_delivery":
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h7a1 1 0 100-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM15 8a1 1 0 10-2 0v5.586l-1.293-1.293a1 1 0 00-1.414 1.414l3 3a1 1 0 001.414 0l3-3a1 1 0 00-1.414-1.414L15 13.586V8z"></path></svg>`;
+          case "exception":
+          case "returned":
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>`;
+          case "pickup_ready":
+          case "pickup_readytoday":
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"></path></svg>`;
+          case "delayed":
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path></svg>`;
+          default:
+            return `<svg class="${colors.icon} w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path></svg>`;
+        }
+      }
+
       function init() {
         Kustomer.initialize(async function (contextJSON) {
-          const parcelLabApiToken = getParcelLabApiToken();
-          if (!parcelLabApiToken) {
-            Kustomer.updateStatus(
-              "danger",
-              "parcelLab API token not configured, go to settings page to set up"
-            );
-            return;
-          }
-
           const email = getEmailFromContext(contextJSON);
           if (!email) {
             Kustomer.close();
             return;
           }
 
+          const container = document.getElementById("container");
+          container.innerHTML = ""; // Clear existing content
+
           Kustomer.open();
+
+          // Add loading spinner
+          container.innerHTML = `
+            <div class="flex justify-center items-center p-4">
+              <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+            </div>
+          `;
+          Kustomer.resize(); // Adjust height for spinner
 
           try {
             const response = await Kustomer.command.run(
@@ -58,65 +156,249 @@
               }
             );
 
+            container.innerHTML = ""; // Clear existing content
+
             const orders = response?.responseBody?.orders || [];
             if (orders.length === 0) {
               Kustomer.updateStatus("info", "No orders found");
+              // Create a card to show "No orders found"
+              const noOrdersCard = document.createElement("div");
+              noOrdersCard.className =
+                "bg-gray-50 rounded-lg shadow-sm p-3 m-1 mb-2 border border-gray-200 text-sm text-gray-600 text-center";
+              noOrdersCard.textContent = "No recent orders found for this customer.";
+              container.appendChild(noOrdersCard);
+              Kustomer.resize();
               return;
             }
+
+            // Create an orders container with a small top margin
+            const ordersContainer = document.createElement("div");
+            ordersContainer.className = "mt-0 space-y-3";
 
             orders.forEach(order => {
               // Create card container
               const card = document.createElement("div");
-              card.className = "bg-white rounded-lg shadow-md p-2 m-1 mb-2 border border-gray-200";
+              card.className = "bg-white rounded-lg shadow-sm p-3 border border-gray-200";
 
               // Create card header
               const header = document.createElement("div");
               header.className = "flex justify-between items-center mb-2";
 
-              // Order number
-              const orderTitle = document.createElement("h3");
-              orderTitle.className = "text-md font-semibold text-slate-800";
-              orderTitle.textContent = `Order ${order.orderNo || "N/A"}`;
-              header.appendChild(orderTitle);
+              // Order number and carrier info
+              const orderInfo = document.createElement("div");
+              orderInfo.className = "flex items-center space-x-2";
 
-              // Order status
-              const status = document.createElement("span");
-              status.className = `px-2 py-1 text-xs font-medium rounded ${
-                order.status === "delivered"
-                  ? "bg-green-100 text-green-800"
-                  : order.status === "in_transit"
-                  ? "bg-blue-100 text-blue-800"
-                  : "bg-gray-100 text-gray-800"
-              }`;
-              status.textContent = order.status || "Processing";
-              header.appendChild(status);
+              const orderTitle = document.createElement("h3");
+              orderTitle.className = "text-sm font-semibold text-gray-800";
+              orderTitle.textContent = `Order ${order.orderNo || "N/A"}`;
+              orderInfo.appendChild(orderTitle);
+
+              header.appendChild(orderInfo);
 
               // Add header to card
               card.appendChild(header);
 
-              // Order details
-              const details = document.createElement("div");
-              details.className = "text-sm text-gray-600 space-y-2";
+              // If there are parcels, display them
+              if (order.parcels && order.parcels.length > 0) {
+                const parcelsContainer = document.createElement("div");
+                parcelsContainer.className = "border-t border-gray-200 pt-2";
 
-              // Delivery date if available
-              if (order.deliveryDate) {
-                const date = document.createElement("p");
-                date.innerHTML = `<span class="font-medium">Delivery Date:</span> ${order.deliveryDate}`;
-                details.appendChild(date);
+                order.parcels.forEach(parcel => {
+                  const parcelCard = document.createElement("div");
+                  const status = parcel.last_delivery_status?.code?.toLowerCase() || "processing";
+                  const statusColors = getStatusColors(status);
+
+                  parcelCard.className = `bg-white`;
+
+                  // Parcel header with status
+                  const parcelHeader = document.createElement("div");
+                  parcelHeader.className = "flex justify-between items-center mb-1";
+
+                  // Status badge
+                  const statusContainer = document.createElement("div");
+                  statusContainer.className = "flex items-center space-x-1";
+
+                  const statusIcon = document.createElement("div");
+                  statusIcon.innerHTML = getStatusIcon(status);
+                  statusContainer.appendChild(statusIcon);
+
+                  const statusBadge = document.createElement("span");
+                  statusBadge.className = `${statusColors.bg} ${statusColors.text} px-2 py-0.5 text-xs font-medium rounded-md`;
+                  statusBadge.textContent = parcel.last_delivery_status?.status || "Processing";
+                  statusContainer.appendChild(statusBadge);
+
+                  parcelHeader.appendChild(statusContainer);
+
+                  // Tracking number
+                  if (parcel.tracking_number) {
+                    const trackingNumber = document.createElement("div");
+                    trackingNumber.className = "text-xs text-gray-500";
+                    trackingNumber.textContent = `#${parcel.tracking_number}`;
+                    parcelHeader.appendChild(trackingNumber);
+                  }
+
+                  parcelCard.appendChild(parcelHeader);
+
+                  // Status details
+                  if (parcel.last_delivery_status?.status_details) {
+                    const statusDetails = document.createElement("p");
+                    statusDetails.className = "text-xs text-gray-600 mb-1";
+                    statusDetails.textContent = parcel.last_delivery_status.status_details;
+                    parcelCard.appendChild(statusDetails);
+                  }
+
+                  // Action box details
+                  if (parcel.actionBox && parcel.actionBox.type) {
+                    const actionBox = document.createElement("div");
+                    actionBox.className = "mt-1 text-xs";
+
+                    // Handle different action box types
+                    switch (parcel.actionBox.type) {
+                      case "pickup-location":
+                        actionBox.innerHTML = `
+                          <div class="flex items-start mt-1">
+                            <svg class="w-4 h-4 text-gray-500 mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            <div>
+                              <span class="font-medium text-gray-700">Pickup Location:</span> 
+                              <span class="text-gray-600">${
+                                parcel.actionBox.address || "N/A"
+                              }</span>
+                            </div>
+                          </div>
+                        `;
+                        break;
+
+                      case "prediction":
+                        if (parcel.actionBox.info) {
+                          actionBox.innerHTML = `
+                            <div class="flex items-start mt-1">
+                              <svg class="w-4 h-4 text-gray-500 mt-0.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                              </svg>
+                              <div>
+                                <span class="font-medium text-gray-700">${
+                                  parcel.actionBox.label || "Estimated Delivery"
+                                }:</span> 
+                                <span class="text-gray-600">${
+                                  parcel.actionBox.info.dayOfWeek || ""
+                                } ${parcel.actionBox.info.dateOfMonth || ""} ${
+                            parcel.actionBox.info.month || ""
+                          }</span>
+                              </div>
+                            </div>
+                          `;
+                        }
+                        break;
+
+                      default:
+                        if (parcel.actionBox.label) {
+                          actionBox.innerHTML = `
+                            <div class="text-gray-600 mt-1">
+                              ${parcel.actionBox.label}
+                            </div>
+                          `;
+                        }
+                    }
+
+                    parcelCard.appendChild(actionBox);
+                  }
+
+                  // Articles/items section if available
+                  if (
+                    parcel.delivery_info &&
+                    parcel.delivery_info.articles &&
+                    parcel.delivery_info.articles.length > 0
+                  ) {
+                    const articleContainer = document.createElement("div");
+                    articleContainer.className = "mt-2";
+
+                    // Items header
+                    const itemsHeader = document.createElement("div");
+                    itemsHeader.className =
+                      "text-xs font-medium text-gray-700 mb-1 flex items-center";
+                    itemsHeader.innerHTML = `
+                      <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" d="M10 2a4 4 0 00-4 4v1H5a1 1 0 00-.994.89l-1 9A1 1 0 004 18h12a1 1 0 00.994-1.11l-1-9A1 1 0 0015 7h-1V6a4 4 0 00-4-4zm2 5V6a2 2 0 10-4 0v1h4zm-6 3a1 1 0 112 0 1 1 0 01-2 0zm7-1a1 1 0 100 2 1 1 0 000-2z" clip-rule="evenodd"></path>
+                      </svg>
+                      Items (${parcel.delivery_info.articles.length})
+                    `;
+                    articleContainer.appendChild(itemsHeader);
+
+                    // Limit to first 2 items to save space, with a "+" indicator if there are more
+                    const displayLimit = 2;
+                    const articlesToShow = parcel.delivery_info.articles.slice(0, displayLimit);
+
+                    articlesToShow.forEach(article => {
+                      const articleItem = document.createElement("div");
+                      articleItem.className = "flex items-center text-xs text-gray-600 mb-1";
+
+                      articleItem.innerHTML = `
+                        <span class="mr-1">${article.quantity}x</span>
+                        <span class="flex-1 truncate">${
+                          article.articleName || "Unknown Item"
+                        }</span>
+                      `;
+
+                      articleContainer.appendChild(articleItem);
+                    });
+
+                    // Show count of remaining items if there are more
+                    if (parcel.delivery_info.articles.length > displayLimit) {
+                      const moreItems = document.createElement("div");
+                      moreItems.className = "text-xs text-gray-500 italic";
+                      moreItems.textContent = `+ ${
+                        parcel.delivery_info.articles.length - displayLimit
+                      } more items`;
+                      articleContainer.appendChild(moreItems);
+                    }
+
+                    parcelCard.appendChild(articleContainer);
+                  }
+
+                  // Links section
+                  if (
+                    parcel.courier &&
+                    parcel.courier.trackingurl &&
+                    !parcel.courier.hide_trackingurl
+                  ) {
+                    const linksContainer = document.createElement("div");
+                    linksContainer.className = "mt-2 text-xs";
+
+                    linksContainer.innerHTML = `
+                      <a href="${
+                        parcel.courier.trackingurl
+                      }" target="_blank" class="text-blue-600 hover:underline flex items-center">
+                        <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"></path>
+                          <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"></path>
+                        </svg>
+                        ${parcel.courier.trackingurl_label || "Track with carrier"}
+                      </a>
+                    `;
+
+                    parcelCard.appendChild(linksContainer);
+                  }
+
+                  parcelsContainer.appendChild(parcelCard);
+                });
+
+                card.appendChild(parcelsContainer);
+              } else {
+                // No parcels found message
+                const noParcels = document.createElement("div");
+                noParcels.className = "text-sm text-gray-500 italic";
+                noParcels.textContent = "No shipment information available";
+                card.appendChild(noParcels);
               }
 
-              // Add more order details as needed
-              if (order.trackingNumber) {
-                const tracking = document.createElement("p");
-                tracking.innerHTML = `<span class="font-medium">Tracking:</span> ${order.trackingNumber}`;
-                details.appendChild(tracking);
-              }
-
-              card.appendChild(details);
-
-              // Add to container
-              document.getElementById("container").appendChild(card);
+              ordersContainer.appendChild(card);
             });
+
+            container.appendChild(ordersContainer);
+            // container.innerHTML = JSON.stringify(response);
 
             Kustomer.resize();
           } catch (error) {
@@ -127,6 +409,6 @@
     </script>
   </head>
   <body onload="init()">
-    <div id="container"></div>
+    <div id="container" class="p-1 overflow-y-auto w-full h-full"></div>
   </body>
 </html>
