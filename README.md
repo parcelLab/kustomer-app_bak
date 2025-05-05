@@ -7,6 +7,18 @@
 * Then we do some stuff in the frontend, see `src/parcellab/src/parcellab-widget.html`
 * Our dev account is: [https://par-parcellab-rory.kustomerapp.com/app](https://par-parcellab-rory.kustomerapp.com/app)
 
+**How to develop:**
+
+Update plugin code:
+```sh
+aws s3 cp src/parcellab_app/src/parcellab-widget.html s3://parcellab-cdn/apps/kustomer/parcellab-widget.html
+```
+
+Update app registration/ code:
+```sh
+npm run register-new-version parcellab_app
+```
+
 ## Docs
 
 ### App Properties
