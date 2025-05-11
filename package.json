@@ -8,7 +8,9 @@
   "repository": "https://github.com/kustomer/kustomer-apps-starter-configs",
   "scripts": {
     "get-app-json": "node ./_scripts/get-app-json",
-    "register-new-version": "node ./_scripts/register-new-version"
+    "register-new-version": "node ./_scripts/register-new-version",
+    "pl:upload-ui": "aws s3 cp src/parcellab_app/src/parcellab-widget.html s3://parcellab-cdn/apps/kustomer/parcellab-widget.html",
+    "pl:register-app": "npm run register-new-version parcellab_app"
   },
   "engines": {
     "node": ">=12"
