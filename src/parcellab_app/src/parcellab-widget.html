@@ -143,7 +143,7 @@
               <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
             </div>
           `;
-          Kustomer.resize(); // Adjust height for spinner
+          Kustomer.resize({ height: "50px" }); // Adjust height for spinner
 
           try {
             const response = await Kustomer.command.run(
@@ -167,7 +167,7 @@
                 "bg-gray-50 rounded-lg shadow-sm p-3 m-1 mb-2 border border-gray-200 text-sm text-gray-600 text-center";
               noOrdersCard.textContent = "No recent orders found for this customer.";
               container.appendChild(noOrdersCard);
-              Kustomer.resize();
+              Kustomer.resize({ height: "50px" });
               return;
             }
 
@@ -400,7 +400,9 @@
             container.appendChild(ordersContainer);
             // container.innerHTML = JSON.stringify(response);
 
-            Kustomer.resize();
+            const height = ordersContainer.scrollHeight;
+
+            Kustomer.resize({ height: `${Math.min(height, 300)}px` });
           } catch (error) {
             Kustomer.updateStatus("danger", "Error retrieving orders");
           }
