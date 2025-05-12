@@ -9,7 +9,7 @@
   "scripts": {
     "get-app-json": "node ./_scripts/get-app-json",
     "register-new-version": "node ./_scripts/register-new-version",
-    "pl:upload-ui": "aws s3 cp src/parcellab_app/src/parcellab-widget.html s3://parcellab-cdn/apps/kustomer/parcellab-widget.html",
+    "pl:upload-ui": "npm run build --prefix src/parcellab_app/src && aws s3 cp src/parcellab_app/src/parcellab-widget.html s3://parcellab-cdn/apps/kustomer/parcellab-widget.html && aws s3 cp --recursive src/parcellab_app/src/dist s3://parcellab-cdn/apps/kustomer/dist/",
     "pl:register-app": "npm run register-new-version parcellab_app"
   },
   "engines": {
