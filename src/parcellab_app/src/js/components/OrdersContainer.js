@@ -13,7 +13,7 @@ export function createOrdersContainer(orders) {
   
   // Create an orders container with a small top margin
   const ordersContainer = document.createElement("div");
-  ordersContainer.className = "mt-0 space-y-3";
+  ordersContainer.className = "mt-0 space-y-2";
   
   orders.forEach(order => {
     const orderCard = createOrderCard(order);
